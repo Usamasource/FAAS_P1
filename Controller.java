@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 
 public class Controller {
     private final Map<String, Action<?, ?>> actions = new HashMap<>();
@@ -10,9 +11,13 @@ public class Controller {
         this.invokers = invokers;
         this.policyManager = policyManager;
     }
-
-    public <T, R> void registerAction(String id, Action<T, R> action) {
+    public void registerAction(String id, Action action) {
         actions.put(id, action);
+    }
+
+    // Sobrecarga para admitir una Function
+    public <T, R> void registerAction(String id, Function<T, R> function, int memoryRequirement) {
+        actions.put(id, new FunctionToActionAdapter<>(function, memoryRequirement));
     }
 
     public <T, R> R invoke(String actionId, T args) throws Exception {
@@ -41,5 +46,7 @@ public class Controller {
 
     public List<Invoker> getInvokers() {
         return invokers;
+    }
+    public void invoke(String string, Map<String, Integer> testData, int i) {
     }
 }
